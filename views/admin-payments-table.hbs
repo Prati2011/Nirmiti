@@ -1,0 +1,235 @@
+<!-- ======= Sidebar ======= -->
+<aside id="sidebar" class="sidebar">
+
+  <ul class="sidebar-nav" id="sidebar-nav">
+
+    <li class="nav-item">
+      <a class="nav-link collapsed" href="/admin/home">
+        <i class="bi bi-grid"></i>
+        <span>Dashboard</span>
+      </a>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link collapsed" href="/admin/attendance">
+        <i class="bi bi-person-check"></i>
+        <span>Attendance</span>
+      </a>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
+        <i class="bi bi-journal-text"></i><span>Customer</span><i class="bi bi-chevron-down ms-auto"></i>
+      </a>
+      <ul id="forms-nav" class="nav-content collapse show" data-bs-parent="#sidebar-nav">
+        <li>
+          <a href="/admin/customer/add">
+            <i class="bi bi-circle"></i><span>Add Customer</span>
+          </a>
+        </li>
+        <li>
+          <a href="/admin/customer/table">
+            <i class="bi bi-circle"></i><span>List Customer</span>
+          </a>
+        </li>
+        <li>
+          <a href="/admin/customer/update">
+            <i class="bi bi-circle"></i><span>Update Customer</span>
+          </a>
+        </li>
+
+        <li>
+          <a href="/admin/customer/payments" class="active">
+            <i class="bi bi-circle"></i><span>Payments</span>
+          </a>
+        </li>
+      </ul>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link collapsed" data-bs-target="#guest-nav" data-bs-toggle="collapse" href="#">
+        <i class="bi bi-ubuntu"></i><span>Guest</span><i class="bi bi-chevron-down  ms-auto"></i>
+      </a>
+      <ul id="guest-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+        <li>
+          <a href="/admin/guest/add">
+            <i class="bi bi-circle"></i><span>Add Guest</span>
+          </a>
+        </li>
+        <li>
+          <a href="/admin/guest/table">
+            <i class="bi bi-circle"></i><span>List Guest</span>
+          </a>
+        </li>
+      </ul>
+    </li>
+
+    <li class="nav-item">
+      <a class="nav-link collapsed" data-bs-target="#sub-nav" data-bs-toggle="collapse" href="#">
+        <i class='bx bxs-wallet-alt'></i><span>Subscription</span><i class="bi bi-chevron-down  ms-auto"></i>
+      </a>
+      <ul id="sub-nav" class="nav-content collapse" data-bs-parent="#sidebar-nav">
+        <li>
+          <a href="/admin/subscription/show">
+            <i class="bi bi-circle"></i><span>Show subscription</span>
+          </a>
+        </li>
+        <li>
+          <a href="/admin/subscription/renew">
+            <i class="bi bi-circle"></i><span>Renew subscription</span>
+          </a>
+        </li>
+        <li>
+          <a href="/admin/subscription/status">
+            <i class="bi bi-circle"></i><span>Change Status</span>
+          </a>
+        </li>
+      </ul>
+    </li><!-- End Dashboard Nav -->
+    <li class="nav-item">
+      <a class="nav-link collapsed" href="/admin/reports">
+        <i class='bx bxs-report'></i>
+        <span>Reports</span>
+      </a>
+    </li><!-- End Dashboard Nav -->
+
+  </ul>
+
+</aside>
+<!-- End Sidebar-->
+
+<main class="main" id="main">
+  <div class="pagetitle">
+    <h1>Payments</h1>
+  </div><!-- End Page Title -->
+
+  <section class="section">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">Customer</h5>
+
+            {{#if success}}
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+              <i class="bi bi-check-circle me-1"></i>
+              {{message}}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {{/if}}
+
+            {{#if err}}
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+              <i class="bi bi-exclamation-octagon me-1"></i>
+              {{message}}
+              <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {{/if}}
+
+            <table class="table">
+              <tr>
+                <td><b>Reg Number</b></td>
+                <td>{{data.ug_number}}</td>
+              </tr>
+              <tr>
+                <td><b>Name</b></td>
+                <td>{{data.first_name}} {{data.last_name}}</td>
+              </tr>
+            </table>
+            <!-- Default Table -->
+            <table id="payments-table" class="table table-striped" style="width:100%">
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Raw Date</th>
+                  <th scope="col">Readable PayDate</th>
+                  <th scope="col">Bill Number</th>
+                  <th scope="col">Total Amount</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Paid Amount</th>
+                  <th scope="col">Online</th>
+                  <th scope="col">Cash</th>
+                  <th scope="col">Pending Amount</th>
+                </tr>
+              </thead>
+              <tbody>
+              </tbody>
+            </table>
+            <!-- End Default Table Example -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script type="module">
+  import { DateTime } from 'https://cdn.jsdelivr.net/npm/luxon@3.2.1/+esm';
+
+  const table = $('#payments-table').DataTable({
+    ajax: {
+      url: '/admin/customer/payments/list?ugnumber={{ugnumber}}',
+      method: 'get',
+      dataSrc: 'data'
+    },
+    scrollX: true,
+    order: [['1', 'desc']],
+    columns: [
+      {
+        render(data, type, row, meta) {
+          return `
+            <a href="/admin/customer/payments/update?ugnumber={{data.ug_number}}&id=${row.id}" class="btn btn-success">
+              <i class="bi bi-arrow-repeat"></i>
+            </a>
+          `;
+        }
+      },
+      {
+        data: 'payment_date',
+        className: 'd-none'
+      },
+      {
+        render(data, type, row, meta) {
+          return DateTime.fromSQL(row.payment_date).toFormat('MMMM dd, yyyy');
+        }
+      },
+      {
+        data: 'bill_number'
+      },
+      {
+        render(data, type, row, meta) {
+          return `<i class="bi bi-currency-rupee"></i><span>${row.total_amount}</span>`;
+        }
+      },
+      {
+        render(data, type, row, meta) {
+          return row.status.toUpperCase();
+        }
+      },
+      {
+        render(data, type, row, meta) {
+          return `<i class="bi bi-currency-rupee"></i><span>${row.paid_amount}</span>`;
+        }
+      },
+
+      {
+        render(data, type, row, meta) {
+          return `<i class="bi bi-currency-rupee"></i><span>${row.online}</span>`;
+        }
+      },
+      {
+        render(data, type, row, meta) {
+          return `<i class="bi bi-currency-rupee"></i><span>${row.cash}</span>`;
+        }
+      },
+      {
+        render(data, type, row, meta) {
+          const total = Number.parseFloat(row.total_amount);
+          const paid = Number.parseFloat(row.paid_amount);
+          const remaning = total - paid;
+          return `<i class="bi bi-currency-rupee"></i><span>${remaning}</span>`;
+        }
+      },
+    ]
+  });
+</script>
